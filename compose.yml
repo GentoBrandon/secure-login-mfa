@@ -1,0 +1,64 @@
+services: 
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: mfa-umg
+      POSTGRES_DB: postgres
+      POSTGRES_USER: umg
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: db
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umg -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    command: sh -c "npm install && npm run start:dev"
+    build: 
+      context: backend
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    expose:
+      - 8000
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://umg:mfa-umg@db:5432/postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=umg
+      - DB_PASSWORD=mfa-umg
+      - DB_DATABASE=postgres
+      - PORT=8000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+  
+  frontend:
+    command: sh -c "npm install && npm run dev"
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    depends_on:
+      - backend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+
+      
