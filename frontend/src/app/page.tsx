@@ -1,103 +1,177 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/auth-context';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Shield, Lock, Mail, CheckCircle } from 'lucide-react';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const { isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Cargando...</p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <header className="text-center py-12">
+          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+            <Shield className="w-8 h-8 text-primary" />
+          </div>
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-4">
+            Secure Login MFA
+          </h1>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Sistema de autenticación seguro con verificación de dos factores (MFA) 
+            para proteger tu cuenta con la máxima seguridad.
+          </p>
+        </header>
+
+        {/* Features */}
+        <section className="max-w-4xl mx-auto mb-12">
+          <div className="grid gap-6 md:grid-cols-3">
+            <Card className="text-center">
+              <CardHeader>
+                <Lock className="w-8 h-8 text-primary mx-auto mb-2" />
+                <CardTitle className="text-lg">Autenticación Segura</CardTitle>
+                <CardDescription>
+                  Protege tu cuenta con contraseñas encriptadas y tokens JWT seguros
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <Mail className="w-8 h-8 text-primary mx-auto mb-2" />
+                <CardTitle className="text-lg">Verificación por Email</CardTitle>
+                <CardDescription>
+                  Recibe códigos de verificación en tu email para confirmar tu identidad
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card className="text-center">
+              <CardHeader>
+                <CheckCircle className="w-8 h-8 text-primary mx-auto mb-2" />
+                <CardTitle className="text-lg">MFA Completo</CardTitle>
+                <CardDescription>
+                  Autenticación de dos factores que combina algo que sabes y algo que tienes
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="max-w-2xl mx-auto text-center">
+          <Card className="p-8">
+            <CardHeader>
+              <CardTitle className="text-2xl mb-4">¿Listo para comenzar?</CardTitle>
+              <CardDescription className="text-lg mb-6">
+                Crea tu cuenta o inicia sesión para experimentar la seguridad avanzada
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 justify-center flex-col sm:flex-row">
+                <Link href="/auth/register">
+                  <Button size="lg" className="text-lg px-8 w-full sm:w-auto">
+                    Crear Cuenta
+                  </Button>
+                </Link>
+                <Link href="/auth/login">
+                  <Button variant="outline" size="lg" className="text-lg px-8 w-full sm:w-auto">
+                    Iniciar Sesión
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Security Features */}
+        <section className="max-w-4xl mx-auto mt-16">
+          <h2 className="text-3xl font-bold text-center mb-8">Características de Seguridad</h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+              <div>
+                <h3 className="font-semibold">Encriptación de Contraseñas</h3>
+                <p className="text-sm text-gray-600">
+                  Utilizamos bcrypt para encriptar todas las contraseñas de manera segura
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+              <div>
+                <h3 className="font-semibold">Tokens JWT</h3>
+                <p className="text-sm text-gray-600">
+                  Tokens seguros con expiración automática y renovación transparente
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+              <div>
+                <h3 className="font-semibold">Códigos MFA Temporales</h3>
+                <p className="text-sm text-gray-600">
+                  Códigos de 6 dígitos con expiración de 5 minutos enviados por email
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+              <div>
+                <h3 className="font-semibold">Base de Datos Segura</h3>
+                <p className="text-sm text-gray-600">
+                  PostgreSQL con Prisma ORM para manejo seguro de datos
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+              <div>
+                <h3 className="font-semibold">Validación de Entrada</h3>
+                <p className="text-sm text-gray-600">
+                  Validación exhaustiva en frontend y backend con Zod
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3">
+              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
+              <div>
+                <h3 className="font-semibold">Sesiones Protegidas</h3>
+                <p className="text-sm text-gray-600">
+                  Gestión automática de sesiones con logout seguro
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
