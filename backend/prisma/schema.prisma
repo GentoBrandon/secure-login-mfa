@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Tabla de usuarios
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String   // Hash de la contraseña
+  firstName String?
+  lastName  String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación con códigos de verificación
+  verificationCodes VerificationCode[]
+
+  @@map("users")
+}
+
+// Tabla de códigos de verificación para MFA
+model VerificationCode {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  code      String   // Código de 6 dígitos
+  type      CodeType @default(LOGIN_MFA) // Tipo de código (LOGIN_MFA, PASSWORD_RESET, etc.)
+  expiresAt DateTime // Fecha de expiración
+  isUsed    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relación con usuario
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("verification_codes")
+  @@index([userId])
+  @@index([code])
+  @@index([expiresAt])
+}
+
+// Enum para tipos de códigos de verificación
+enum CodeType {
+  LOGIN_MFA
+  PASSWORD_RESET
+  EMAIL_VERIFICATION
+}
