@@ -146,7 +146,7 @@ export const MfaVerification: React.FC<MfaVerificationProps> = ({
       } else {
         setMessage({
           type: 'error',
-          text: result.message || 'Código de verificación inválido'
+          text: result.message || 'Código de verificación incorrecto'
         });
       }
     } catch (error) {
@@ -188,7 +188,7 @@ export const MfaVerification: React.FC<MfaVerificationProps> = ({
                   type="text"
                   inputMode="numeric"
                   pattern="\d"
-                  maxLength={6}
+                  maxLength={1}
                   className="w-12 h-12 text-center text-lg font-mono"
                   onChange={(e) => handleCodeInput(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}

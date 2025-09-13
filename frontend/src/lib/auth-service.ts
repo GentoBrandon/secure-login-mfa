@@ -34,32 +34,44 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const status = error.response?.status;
+    const requestUrl: string = originalRequest?.url || '';
+    const isAuthFlow =
+      requestUrl.includes('/login') ||
+      requestUrl.includes('/register') ||
+      requestUrl.includes('/verify-mfa') ||
+      requestUrl.includes('/validate-token');
+
+    if (status === 401 && !originalRequest._retry) {
+      // No intentes refresh ni redirijas en endpoints del flujo de auth
+      if (isAuthFlow) {
+        return Promise.reject(error);
+      }
+
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (!refreshToken) {
+        // Sin refresh token, no recargues la página; deja que el caller maneje el error
+        return Promise.reject(error);
+      }
+
       originalRequest._retry = true;
-      
+
       try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refreshToken
-          });
-          
-          if (response.data.success) {
-            localStorage.setItem('accessToken', response.data.accessToken);
-            originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
-            return api(originalRequest);
-          }
+        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken });
+        if (response.data.success) {
+          localStorage.setItem('accessToken', response.data.accessToken);
+          originalRequest.headers.Authorization = `Bearer ${response.data.accessToken}`;
+          return api(originalRequest);
         }
       } catch (refreshError) {
-        // Si falla el refresh, limpiar tokens y redirigir al login
+        // Si falla el refresh teniendo refreshToken, limpiar y redirigir
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
         window.location.href = '/auth/login';
       }
     }
-    
+
     return Promise.reject(error);
   }
 );
@@ -70,9 +82,9 @@ export class AuthService {
       const response = await api.post('/register', credentials);
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error en el registro';
+      const axiosErr = error as { response?: { status?: number; data?: { message?: string } } };
+      const apiMessage = axiosErr?.response?.data?.message;
+      const errorMessage = apiMessage || (error instanceof Error ? error.message : 'Error en el registro');
       throw new Error(errorMessage);
     }
   }
@@ -82,9 +94,12 @@ export class AuthService {
       const response = await api.post('/login', credentials);
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error en el login';
+      const axiosErr = error as { response?: { status?: number; data?: { message?: string } } };
+      const status = axiosErr?.response?.status;
+      const apiMessage = axiosErr?.response?.data?.message;
+      const errorMessage = status === 401
+        ? 'Email o contraseña incorrectos'
+        : (apiMessage || (error instanceof Error ? error.message : 'Error en el login'));
       throw new Error(errorMessage);
     }
   }
@@ -102,9 +117,12 @@ export class AuthService {
       
       return response.data;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
-        : (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Error en la verificación MFA';
+      const axiosErr = error as { response?: { status?: number; data?: { message?: string } } };
+      const status = axiosErr?.response?.status;
+      const apiMessage = axiosErr?.response?.data?.message;
+      const errorMessage = status === 400 || status === 401
+        ? (apiMessage || 'Código de verificación incorrecto')
+        : (apiMessage || (error instanceof Error ? error.message : 'Error en la verificación MFA'));
       throw new Error(errorMessage);
     }
   }

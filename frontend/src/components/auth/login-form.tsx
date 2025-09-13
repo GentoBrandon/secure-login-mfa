@@ -24,6 +24,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
@@ -41,9 +42,15 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         });
         onLoginSuccess(data.email, result.tempToken);
       } else {
+        const msg = result.message || 'Error en el login';
+        const looksLikeCredentialIssue = /credencial|contraseñ|incorrect|invalid|unauthorized|no autorizado/i.test(msg);
+        if (looksLikeCredentialIssue) {
+          setError('email', { type: 'manual', message: 'Email o contraseña incorrectos' });
+          setError('password', { type: 'manual', message: 'Email o contraseña incorrectos' });
+        }
         setMessage({
           type: 'error',
-          text: result.message || 'Error en el login'
+          text: looksLikeCredentialIssue ? 'Email o contraseña incorrectos' : msg
         });
       }
     } catch (error) {
@@ -122,6 +129,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
           >
             {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </Button>
+          {isLoading && (
+            <p className="text-xs text-muted-foreground text-center">Procesando...</p>
+          )}
         </form>
       </CardContent>
     </Card>

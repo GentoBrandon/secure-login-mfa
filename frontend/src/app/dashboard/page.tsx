@@ -121,45 +121,7 @@ export default function DashboardPage() {
                   </p>
                 </CardContent>
               </Card>
-            </div>
-
-            {/* Features Section */}
-            <Card className="max-w-4xl mx-auto">
-              <CardHeader>
-                <CardTitle>Características de Seguridad</CardTitle>
-                <CardDescription>
-                  Tu cuenta está protegida con las siguientes medidas de seguridad
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span>Autenticación de dos factores (2FA)</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span>Encriptación de contraseñas</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span>Tokens JWT seguros</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span>Renovación automática de tokens</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span>Verificación por email</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500" />
-                    <span>Sesiones seguras</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            </div>            
           </div>
         </main>
       </div>
