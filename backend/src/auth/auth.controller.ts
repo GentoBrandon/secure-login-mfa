@@ -32,7 +32,6 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
-    // Paso 1: Validar credenciales
     const user = await this.authService.validateUser(loginDto);
     
     if (!user) {
@@ -42,13 +41,12 @@ export class AuthController {
       );
     }
 
-    // Paso 2: Generar código MFA y enviarlo por email
     const mfaCode = await this.authService.generateMfaCode(user.id);
 
     return {
       success: true,
       message: 'Código de verificación enviado a tu email',
-      tempToken: `temp_${user.id}_${Date.now()}`, // Token temporal para identificar la sesión
+      tempToken: `temp_${user.id}_${Date.now()}`, 
       expiresAt: mfaCode.expiresAt,
     };
   }

@@ -17,7 +17,6 @@ export class AuthService {
     private emailService: EmailService,
   ) {}
 
-  // Crear usuario
   async createUser(createUserDto: CreateUserDto) {
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     
@@ -38,7 +37,6 @@ export class AuthService {
       },
     });
 
-    // Enviar email de bienvenida (no bloquear el registro si falla)
     try {
       const userName = user.firstName ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ''}` : undefined;
       await this.emailService.sendWelcomeEmail(user.email, userName);
@@ -50,7 +48,6 @@ export class AuthService {
     return user;
   }
 
-  // Validar credenciales (paso 1 del login)
   async validateUser(loginDto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email },
@@ -73,9 +70,7 @@ export class AuthService {
     };
   }
 
-  // Generar código de verificación MFA (paso 2 del login)
   async generateMfaCode(userId: number, type: CodeType = CodeType.LOGIN_MFA) {
-    // Obtener información del usuario para el email
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -89,15 +84,12 @@ export class AuthService {
       throw new Error('Usuario no encontrado');
     }
 
-    // Generar código de 6 dígitos
     const code = crypto.randomInt(100000, 999999).toString();
     
-    // Configurar expiración (10 minutos por defecto)
     const expirationMinutes = parseInt(process.env.MFA_CODE_EXPIRATION_MINUTES || '10');
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + expirationMinutes);
 
-    // Invalidar códigos anteriores del mismo tipo para este usuario
     await this.prisma.verificationCode.updateMany({
       where: {
         userId,
@@ -110,7 +102,6 @@ export class AuthService {
       },
     });
 
-    // Crear nuevo código
     const verificationCode = await this.prisma.verificationCode.create({
       data: {
         userId,
@@ -120,7 +111,6 @@ export class AuthService {
       },
     });
 
-    // Enviar código por email
     try {
       const userName = user.firstName ? `${user.firstName}${user.lastName ? ` ${user.lastName}` : ''}` : undefined;
       
@@ -146,9 +136,7 @@ export class AuthService {
     };
   }
 
-  // Verificar código MFA (paso 3 del login)
   async verifyMfaCode(verifyMfaDto: VerifyMfaDto): Promise<{ success: boolean; message?: string; user?: any; tokens?: TokenPair }> {
-    // Buscar usuario
     const user = await this.prisma.user.findUnique({
       where: { email: verifyMfaDto.email },
     });
@@ -157,7 +145,6 @@ export class AuthService {
       return { success: false, message: 'Usuario no encontrado' };
     }
 
-    // Buscar código válido
     const verificationCode = await this.prisma.verificationCode.findFirst({
       where: {
         userId: user.id,
@@ -172,13 +159,11 @@ export class AuthService {
       return { success: false, message: 'Código inválido o expirado' };
     }
 
-    // Marcar código como usado
     await this.prisma.verificationCode.update({
       where: { id: verificationCode.id },
       data: { isUsed: true },
     });
 
-    // Generar tokens JWT
     const tokens = await this.jwtService.generateTokens({
       id: user.id,
       email: user.email,
@@ -193,12 +178,13 @@ export class AuthService {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
       },
       tokens,
     };
   }
 
-  // Limpiar códigos expirados (tarea de mantenimiento)
   async cleanExpiredCodes() {
     const result = await this.prisma.verificationCode.deleteMany({
       where: {
@@ -209,7 +195,6 @@ export class AuthService {
     return { deletedCount: result.count };
   }
 
-  // Obtener estadísticas de códigos
   async getCodeStats(userId: number) {
     const stats = await this.prisma.verificationCode.groupBy({
       by: ['type'],
@@ -222,7 +207,6 @@ export class AuthService {
     return stats;
   }
 
-  // Refrescar access token usando refresh token
   async refreshTokens(refreshToken: string): Promise<{ success: boolean; message?: string; accessToken?: string; expiresIn?: number }> {
     try {
       const result = await this.jwtService.refreshAccessToken(refreshToken);
@@ -240,7 +224,6 @@ export class AuthService {
     }
   }
 
-  // Obtener información del usuario desde un token válido
   async getUserFromToken(token: string): Promise<{ success: boolean; user?: any; message?: string }> {
     try {
       const payload = await this.jwtService.verifyAccessToken(token);
@@ -276,7 +259,6 @@ export class AuthService {
     }
   }
 
-  // Probar conexión de email
   async testEmailConnection(): Promise<{ success: boolean; message?: string }> {
     try {
       const isConnected = await this.emailService.testConnection();
@@ -293,7 +275,6 @@ export class AuthService {
     }
   }
 
-  // Enviar email de prueba
   async sendTestEmail(email: string): Promise<boolean> {
     try {
       const testCode = '123456';
