@@ -81,7 +81,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new Error('Usuario no encontrado');
+      throw new Error('User not found');
     }
 
     const code = crypto.randomInt(100000, 999999).toString();
@@ -142,7 +142,7 @@ export class AuthService {
     });
 
     if (!user) {
-      return { success: false, message: 'Usuario no encontrado' };
+      return { success: false, message: 'User not found' };
     }
 
     const verificationCode = await this.prisma.verificationCode.findFirst({
@@ -156,7 +156,7 @@ export class AuthService {
     });
 
     if (!verificationCode) {
-      return { success: false, message: 'Código inválido o expirado' };
+      return { success: false, message: 'Invalid or expired code' };
     }
 
     await this.prisma.verificationCode.update({
@@ -219,7 +219,7 @@ export class AuthService {
     } catch (error) {
       return {
         success: false,
-        message: 'Refresh token inválido o expirado',
+        message: 'Refresh token invalid or expired',
       };
     }
   }
@@ -243,7 +243,7 @@ export class AuthService {
       if (!user || !user.isActive) {
         return {
           success: false,
-          message: 'Usuario no encontrado o inactivo',
+          message: 'User not found or inactive',
         };
       }
 
@@ -254,7 +254,7 @@ export class AuthService {
     } catch (error) {
       return {
         success: false,
-        message: 'Token inválido',
+        message: 'Token invalid',
       };
     }
   }
@@ -264,13 +264,13 @@ export class AuthService {
       const isConnected = await this.emailService.testConnection();
       return {
         success: isConnected,
-        message: isConnected ? 'Conexión de email exitosa' : 'Error en la conexión de email',
+        message: isConnected ? 'Email connection successful' : 'Error in email connection',
       };
     } catch (error) {
       this.logger.error('Email connection test failed:', error);
       return {
         success: false,
-        message: 'Error al probar conexión de email',
+        message: 'Error in email connection test',
       };
     }
   }
@@ -278,7 +278,7 @@ export class AuthService {
   async sendTestEmail(email: string): Promise<boolean> {
     try {
       const testCode = '123456';
-      const success = await this.emailService.sendMfaCode(email, testCode, 'Usuario de Prueba');
+      const success = await this.emailService.sendMfaCode(email, testCode, 'Test User');
       
       if (success) {
         this.logger.log(`Test email sent successfully to ${email}`);

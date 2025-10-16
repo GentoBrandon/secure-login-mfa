@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
 export interface JwtPayload {
-  sub: number; // user id
+  sub: number; 
   email: string;
   firstName?: string;
   lastName?: string;
@@ -14,7 +14,7 @@ export interface JwtPayload {
 export interface TokenPair {
   accessToken: string;
   refreshToken: string;
-  expiresIn: number; // segundos hasta expiración del access token
+  expiresIn: number; 
 }
 
 @Injectable()
@@ -25,7 +25,7 @@ export class AuthJwtService {
   ) {}
 
   /**
-   * Genera un par de tokens (access y refresh) para un usuario
+   * Generates a pair of tokens (access and refresh) for a user
    */
   async generateTokens(user: { id: number; email: string; firstName?: string; lastName?: string }): Promise<TokenPair> {
     const payload: JwtPayload = {
@@ -40,7 +40,7 @@ export class AuthJwtService {
       this.generateRefreshToken(payload),
     ]);
 
-    // Obtener tiempo de expiración del access token en segundos
+    // Get access token expiration time in seconds
     const expiresIn = this.getAccessTokenExpirationInSeconds();
 
     return {
@@ -51,7 +51,7 @@ export class AuthJwtService {
   }
 
   /**
-   * Genera un access token
+   * Generates an access token
    */
   private async generateAccessToken(payload: JwtPayload): Promise<string> {
     return this.jwtService.signAsync(payload, {
@@ -61,7 +61,7 @@ export class AuthJwtService {
   }
 
   /**
-   * Genera un refresh token
+   * Generates a refresh token
    */
   private async generateRefreshToken(payload: JwtPayload): Promise<string> {
     return this.jwtService.signAsync(payload, {
@@ -71,7 +71,7 @@ export class AuthJwtService {
   }
 
   /**
-   * Verifica y decodifica un access token
+   * Verifies and decodes an access token
    */
   async verifyAccessToken(token: string): Promise<JwtPayload> {
     return this.jwtService.verifyAsync(token, {
@@ -80,7 +80,7 @@ export class AuthJwtService {
   }
 
   /**
-   * Verifica y decodifica un refresh token
+   * Verifies and decodes a refresh token
    */
   async verifyRefreshToken(token: string): Promise<JwtPayload> {
     return this.jwtService.verifyAsync(token, {
@@ -89,13 +89,13 @@ export class AuthJwtService {
   }
 
   /**
-   * Refresca un access token usando un refresh token válido
+   * Refreshes an access token using a valid refresh token
    */
   async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string; expiresIn: number }> {
     try {
       const payload = await this.verifyRefreshToken(refreshToken);
       
-      // Crear nuevo payload sin iat y exp para el nuevo token
+      // Create new payload without iat and exp for the new token
       const newPayload: JwtPayload = {
         sub: payload.sub,
         email: payload.email,
@@ -116,12 +116,12 @@ export class AuthJwtService {
   }
 
   /**
-   * Obtiene el tiempo de expiración del access token en segundos
+   * Gets the expiration time of the access token in seconds
    */
   private getAccessTokenExpirationInSeconds(): number {
     const expiration = this.configService.get<string>('JWT_ACCESS_EXPIRATION', '15m');
     
-    // Convertir formato de tiempo a segundos
+    // Convert time format to seconds
     if (expiration.endsWith('m')) {
       return parseInt(expiration.slice(0, -1)) * 60;
     } else if (expiration.endsWith('h')) {
@@ -131,13 +131,13 @@ export class AuthJwtService {
     } else if (expiration.endsWith('s')) {
       return parseInt(expiration.slice(0, -1));
     } else {
-      // Asumir que es en segundos si no hay unidad
+      // Assume it's in seconds if there is no unit
       return parseInt(expiration);
     }
   }
 
   /**
-   * Extrae el token del header Authorization
+   * Extracts the token from the Authorization header
    */
   extractTokenFromHeader(authHeader: string): string | null {
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

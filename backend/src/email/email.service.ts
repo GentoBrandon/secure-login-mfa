@@ -39,7 +39,7 @@ export class EmailService {
         pass: smtpPass,
       },
       tls: {
-        rejectUnauthorized: false, // Para desarrollo, en producción usar certificados válidos
+        rejectUnauthorized: false, // for dec, in production set to true and use valid certs
       },
     });
 

@@ -16,7 +16,6 @@ export class ProtectedController {
 
   @Get('admin')
   getAdminData(@Request() req) {
-    // Aquí podrías verificar roles adicionales
     return {
       success: true,
       message: 'Datos administrativos',

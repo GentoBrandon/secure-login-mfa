@@ -110,67 +110,7 @@ export default function Home() {
             </CardContent>
           </Card>
         </section>
-
-        {/* Security Features */}
-        <section className="max-w-4xl mx-auto mt-16">
-          <h2 className="text-3xl font-bold text-center mb-8">Características de Seguridad</h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
-              <div>
-                <h3 className="font-semibold">Encriptación de Contraseñas</h3>
-                <p className="text-sm text-gray-600">
-                  Utilizamos bcrypt para encriptar todas las contraseñas de manera segura
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
-              <div>
-                <h3 className="font-semibold">Tokens JWT</h3>
-                <p className="text-sm text-gray-600">
-                  Tokens seguros con expiración automática y renovación transparente
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
-              <div>
-                <h3 className="font-semibold">Códigos MFA Temporales</h3>
-                <p className="text-sm text-gray-600">
-                  Códigos de 6 dígitos con expiración de 5 minutos enviados por email
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
-              <div>
-                <h3 className="font-semibold">Base de Datos Segura</h3>
-                <p className="text-sm text-gray-600">
-                  PostgreSQL con Prisma ORM para manejo seguro de datos
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
-              <div>
-                <h3 className="font-semibold">Validación de Entrada</h3>
-                <p className="text-sm text-gray-600">
-                  Validación exhaustiva en frontend y backend con Zod
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-3">
-              <CheckCircle className="w-5 h-5 text-green-500 mt-1" />
-              <div>
-                <h3 className="font-semibold">Sesiones Protegidas</h3>
-                <p className="text-sm text-gray-600">
-                  Gestión automática de sesiones con logout seguro
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+        
       </div>
     </div>
   );

@@ -10,20 +10,20 @@ export class JwtAuthGuard implements CanActivate {
     const authHeader = request.headers.authorization;
 
     if (!authHeader) {
-      throw new UnauthorizedException('Token de acceso requerido');
+      throw new UnauthorizedException('Token acces noot provided');
     }
 
     const token = this.jwtService.extractTokenFromHeader(authHeader);
     if (!token) {
-      throw new UnauthorizedException('Formato de token inválido');
+      throw new UnauthorizedException('Formt invalid, token missing');
     }
 
     try {
       const payload = await this.jwtService.verifyAccessToken(token);
-      request.user = payload; // Agregar usuario al request
+      request.user = payload; 
       return true;
     } catch (error) {
-      throw new UnauthorizedException('Token de acceso inválido o expirado');
+      throw new UnauthorizedException('Token access invalid or expired');
     }
   }
 }

@@ -13,18 +13,18 @@ export class AuthController {
       const user = await this.authService.createUser(createUserDto);
       return {
         success: true,
-        message: 'Usuario creado exitosamente',
+        message: 'User registered successfully',
         user,
       };
     } catch (error) {
       if (error.code === 'P2002') {
         throw new HttpException(
-          'El email ya está registrado',
+          'Email already in use',
           HttpStatus.CONFLICT,
         );
       }
       throw new HttpException(
-        'Error interno del servidor',
+        'Error internal server',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -36,7 +36,7 @@ export class AuthController {
     
     if (!user) {
       throw new HttpException(
-        'Credenciales inválidas',
+        'Credentials invalid',
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -57,14 +57,14 @@ export class AuthController {
 
     if (!result.success) {
       throw new HttpException(
-        result.message ?? 'Código de verificación inválido',
+        result.message ?? 'Invalid verification code',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     return {
       success: true,
-      message: 'Autenticación completada exitosamente',
+      message: 'Authentication completed successfully',
       user: result.user,
       tokens: result.tokens,
     };
@@ -74,7 +74,7 @@ export class AuthController {
   async refreshToken(@Body() refreshTokenDto: RefreshTokenDto) {
     if (!refreshTokenDto.refreshToken) {
       throw new HttpException(
-        'Refresh token requerido',
+        'Refresh token required',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -83,14 +83,14 @@ export class AuthController {
 
     if (!result.success) {
       throw new HttpException(
-        result.message ?? 'Refresh token inválido',
+        result.message ?? 'Refresh token invalid',
         HttpStatus.UNAUTHORIZED,
       );
     }
 
     return {
       success: true,
-      message: 'Token renovado exitosamente',
+      message: 'Token refreshed successfully',
       accessToken: result.accessToken,
       expiresIn: result.expiresIn,
     };
@@ -105,7 +105,7 @@ export class AuthController {
 
     if (!result.success) {
       throw new HttpException(
-        result.message ?? 'Error al obtener perfil',
+        result.message ?? 'Error getting profile',
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -121,7 +121,7 @@ export class AuthController {
   async validateToken(@Request() req) {
     return {
       success: true,
-      message: 'Token válido',
+      message: 'Token valid',
       user: req.user,
     };
   }
@@ -130,7 +130,7 @@ export class AuthController {
   async testEmail(@Body('email') email: string) {
     if (!email) {
       throw new HttpException(
-        'Email requerido',
+        'Email required',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -140,7 +140,7 @@ export class AuthController {
     if (!testResult.success) {
       return {
         success: false,
-        message: 'Error en la configuración de email',
+        message: 'Error in email configuration',
         error: testResult.message,
       };
     }
@@ -151,8 +151,8 @@ export class AuthController {
     return {
       success: emailSent,
       message: emailSent 
-        ? 'Email de prueba enviado exitosamente' 
-        : 'Error al enviar email de prueba',
+        ? 'Test email sent successfully' 
+        : 'Error sending test email',
     };
   }
 }

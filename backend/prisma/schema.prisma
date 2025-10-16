@@ -31,14 +31,13 @@ model User {
 model VerificationCode {
   id        Int      @id @default(autoincrement())
   userId    Int
-  code      String   // Código de 6 dígitos
-  type      CodeType @default(LOGIN_MFA) // Tipo de código (LOGIN_MFA, PASSWORD_RESET, etc.)
-  expiresAt DateTime // Fecha de expiración
+  code      String   
+  type      CodeType @default(LOGIN_MFA) 
+  expiresAt DateTime 
   isUsed    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relación con usuario
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("verification_codes")
@@ -47,7 +46,18 @@ model VerificationCode {
   @@index([expiresAt])
 }
 
-// Enum para tipos de códigos de verificación
+model Products {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("products")
+}
+
 enum CodeType {
   LOGIN_MFA
   PASSWORD_RESET
