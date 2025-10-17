@@ -24,7 +24,7 @@ model User {
   // Relación con códigos de verificación
   verificationCodes VerificationCode[]
 
-  @@map("users")
+  @@map("user")
 }
 
 // Tabla de códigos de verificación para MFA
